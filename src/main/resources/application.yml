@@ -6,9 +6,9 @@ spring:
     name: ms-books-catalogue
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/catalogue_db
-    username: catalogue_user
-    password: catalogue_password
+    url: jdbc:postgresql://localhost:5432/libros_db
+    username: libreria
+    password: catalogos_libreria
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -29,8 +29,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
+    register-with-eureka: false
+    fetch-registry: false
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
