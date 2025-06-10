@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  postgres-catalogue:
+    image: postgres:15-alpine
+    container_name: postgres-catalogue
+    environment:
+      POSTGRES_DB: catalogue_db
+      POSTGRES_USER: catalogue_user
+      POSTGRES_PASSWORD: catalogue_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_catalogue_data:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d
+    networks:
+      - catalogue-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-catalogue
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres-catalogue
+    networks:
+      - catalogue-network
+
+volumes:
+  postgres_catalogue_data:
+
+networks:
+  catalogue-network:
+    driver: bridge
