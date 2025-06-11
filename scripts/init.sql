@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS libros (
     visible BOOLEAN NOT NULL DEFAULT true,
     stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
     precio NUMERIC(10, 2) NOT NULL CHECK (precio >= 0),
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_cracion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
 -- Insertar datos de prueba
