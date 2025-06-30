@@ -23,10 +23,18 @@ public class LibroController {
     /**
      * GET /api/libros
      * Retorna todos los libros.
+     * Permite filtrar libros por título, autor o rango de fechas.
      */
     @GetMapping
-    public List<LibroEntity> obtenerTodos() {
-        return libroService.obtenerTodos();
+    public List<LibroEntity> obtenerYFiltrarLibros(
+            @RequestParam(required = false) String titulo,
+            @RequestParam(required = false) String autor,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) Integer valoracion,
+            @RequestParam(required = false) LocalDate fechaInicio,
+            @RequestParam(required = false) LocalDate fechaFin
+    ) {
+        return libroService.buscarLibros(titulo, autor, fechaInicio, fechaFin, categoria, valoracion);
     }
 
     /**
@@ -36,20 +44,6 @@ public class LibroController {
     @GetMapping("/{id}")
     public LibroEntity obtenerPorId(@PathVariable Long id) {
         return libroService.obtenerPorId(id);
-    }
-
-    /**
-     * GET /api/libros/buscar
-     * Permite filtrar libros por título, autor o rango de fechas.
-     */
-    @GetMapping("/buscar")
-    public List<LibroEntity> buscarLibros(
-            @RequestParam(required = false) String titulo,
-            @RequestParam(required = false) String autor,
-            @RequestParam(required = false) LocalDate fechaInicio,
-            @RequestParam(required = false) LocalDate fechaFin
-    ) {
-        return libroService.buscarLibros(titulo, autor, fechaInicio, fechaFin);
     }
 
     /**

@@ -36,27 +36,34 @@ public class LibroService {
     private final LibroRepository libroRepository;
 
     /**
-     * Devuelve una lista con todos los libros disponibles en la base de datos.
+     * Devuelve todos los libros si no hay filtros,
+     * o realiza una búsqueda aplicando los filtros proporcionados.
      */
-    public List<LibroEntity> obtenerTodos() {
-        return libroRepository.findAll();
+    public List<LibroEntity> buscarLibros(String titulo, String autor, LocalDate fechaInicio, LocalDate fechaFin, String categoria, Integer valoracion) {
+        // Si todos los parámetros están vacíos, devuelve todos
+        boolean sinFiltros =
+                (titulo == null || titulo.isBlank()) &&
+                (autor == null || autor.isBlank()) &&
+                (categoria == null || categoria.isBlank()) &&
+                valoracion == null &&
+                fechaInicio == null &&
+                fechaFin == null;
+
+
+        if (sinFiltros) {
+            return libroRepository.findAll();
+        }
+
+        // Si hay al menos un filtro, ejecutar búsqueda filtrada
+        return libroRepository.buscarLibros(titulo, autor, categoria, valoracion, fechaInicio, fechaFin);
     }
+
 
 
     /** Retorna un libro por ID o lanza excepción si no existe **/
     public LibroEntity obtenerPorId(Long id) {
         return libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado con ID: " + id));
-    }
-
-    /**
-     * Realiza una búsqueda de libros aplicando filtros opcionales:
-     * - Título (puede ser parcial)
-     * - Autor (puede ser parcial)
-     * - Fecha de publicación mínima y máxima
-     */
-    public List<LibroEntity> buscarLibros(String titulo, String autor, LocalDate fechaInicio, LocalDate fechaFin) {
-        return libroRepository.buscarLibros(titulo, autor, fechaInicio, fechaFin);
     }
 
     /**

@@ -7,6 +7,7 @@ import com.relatosdepapel.catalogue.entity.LibroEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,15 +33,21 @@ public interface LibroRepository extends JpaRepository<LibroEntity, Long> {
      *
      * Si algún parámetro es null, se ignora ese filtro.
      */
-    @Query("SELECT l FROM LibroEntity l WHERE " +
-            "(:titulo IS NULL OR LOWER(l.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))) AND " + //Usar LIKE con LOWER() garantiza búsquedas insensibles a mayúscula
-            "(:autor IS NULL OR LOWER(l.autor) LIKE LOWER(CONCAT('%', :autor, '%'))) AND " + //Los parámetros :titulo, :autor, etc., pueden ser null para hacer búsquedas flexibles.
-            "(:fechaInicio IS NULL OR l.fechaPublicacion >= :fechaInicio) AND " +
-            "(:fechaFin IS NULL OR l.fechaPublicacion <= :fechaFin)")
+    @Query(value = "SELECT * FROM libros l WHERE " +
+            "(:titulo IS NULL OR l.titulo ILIKE CONCAT('%', :titulo, '%')) AND " +
+            "(:autor IS NULL OR l.autor ILIKE CONCAT('%', :autor, '%')) AND " +
+            "(:categoria IS NULL OR l.categoria ILIKE CONCAT('%', :categoria, '%')) AND " +
+            "(:valoracion IS NULL OR l.valoracion = :valoracion) AND " +
+            "(:fechaInicio IS NULL OR l.fecha_publicacion >= :fechaInicio) AND " +
+            "(:fechaFin IS NULL OR l.fecha_publicacion <= :fechaFin)",
+            nativeQuery = true)
     List<LibroEntity> buscarLibros(
-            @Param("titulo") String titulo,             // Parámetro de búsqueda por título parcial
-            @Param("autor") String autor,               // Parámetro de búsqueda por autor parcial
-            @Param("fechaInicio") LocalDate fechaInicio, // Fecha mínima de publicación
-            @Param("fechaFin") LocalDate fechaFin        // Fecha máxima de publicación
+            @Param("titulo") @Nullable String titulo,
+            @Param("autor") @Nullable String autor,
+            @Param("categoria") @Nullable String categoria,
+            @Param("valoracion") @Nullable Integer valoracion,
+            @Param("fechaInicio") @Nullable LocalDate fechaInicio,
+            @Param("fechaFin") @Nullable LocalDate fechaFin
     );
+
 }
