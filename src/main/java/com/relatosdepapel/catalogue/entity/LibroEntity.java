@@ -72,7 +72,7 @@ public class LibroEntity {
     @Column(name = "precio", precision = 10, scale = 2) // Permite precios con 2 decimales (hasta 99999999.99)
     private BigDecimal precio;
 
-    @Column(name = "fecha_cracion")
+    @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion; // Fecha de creación
 
     @Column(name = "fecha_actualizacion")
