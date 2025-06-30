@@ -52,10 +52,7 @@ public class LibroService {
                 .toList();
     }
 
-
-
-
-        /** Retorna un libro por ID o lanza excepción si no existe **/
+    /** Retorna un libro por ID o lanza excepción si no existe **/
     public LibroEntity obtenerPorId(Long id) {
         return libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado con ID: " + id));
@@ -68,7 +65,6 @@ public class LibroService {
     public LibroEntity guardarLibro(LibroEntity libro) {
         return libroRepository.save(libro);
     }
-
 
     /** Actualiza todos los campos de un libro existente **/
     public LibroEntity actualizarLibroCompleto(Long id, LibroEntity libroActualizado) {

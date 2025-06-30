@@ -24,30 +24,5 @@ public interface LibroRepository extends JpaRepository<LibroEntity, Long> {
     // Busca libros cuyo autor contenga el texto proporcionado, sin importar mayúsculas o minúsculas.
     List<LibroEntity> findByAutorContainingIgnoreCase(String autor);
 
-    /**
-     * Consulta personalizada con JPQL que permite buscar libros de forma avanzada.
-     * Esta búsqueda permite combinar varios filtros opcionales:
-     * - Título parcial (ignora mayúsculas)
-     * - Autor parcial (ignora mayúsculas)
-     * - Rango de fechas de publicación (fechaInicio y fechaFin)
-     *
-     * Si algún parámetro es null, se ignora ese filtro.
-     */
-    @Query(value = "SELECT * FROM libros l WHERE " +
-            "(:titulo IS NULL OR l.titulo ILIKE CONCAT('%', :titulo, '%')) AND " +
-            "(:autor IS NULL OR l.autor ILIKE CONCAT('%', :autor, '%')) AND " +
-            "(:categoria IS NULL OR l.categoria ILIKE CONCAT('%', :categoria, '%')) AND " +
-            "(:valoracion IS NULL OR l.valoracion = :valoracion) AND " +
-            "(:fechaInicio IS NULL OR l.fecha_publicacion >= :fechaInicio) AND " +
-            "(:fechaFin IS NULL OR l.fecha_publicacion <= :fechaFin)",
-            nativeQuery = true)
-    List<LibroEntity> buscarLibros(
-            @Param("titulo") @Nullable String titulo,
-            @Param("autor") @Nullable String autor,
-            @Param("categoria") @Nullable String categoria,
-            @Param("valoracion") @Nullable Integer valoracion,
-            @Param("fechaInicio") @Nullable LocalDate fechaInicio,
-            @Param("fechaFin") @Nullable LocalDate fechaFin
-    );
 
 }
