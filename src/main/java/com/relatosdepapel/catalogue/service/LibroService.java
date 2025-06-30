@@ -40,27 +40,22 @@ public class LibroService {
      * o realiza una búsqueda aplicando los filtros proporcionados.
      */
     public List<LibroEntity> buscarLibros(String titulo, String autor, LocalDate fechaInicio, LocalDate fechaFin, String categoria, Integer valoracion) {
-        // Si todos los parámetros están vacíos, devuelve todos
-        boolean sinFiltros =
-                (titulo == null || titulo.isBlank()) &&
-                (autor == null || autor.isBlank()) &&
-                (categoria == null || categoria.isBlank()) &&
-                valoracion == null &&
-                fechaInicio == null &&
-                fechaFin == null;
+        List<LibroEntity> libros = libroRepository.findAll();
 
-
-        if (sinFiltros) {
-            return libroRepository.findAll();
-        }
-
-        // Si hay al menos un filtro, ejecutar búsqueda filtrada
-        return libroRepository.buscarLibros(titulo, autor, categoria, valoracion, fechaInicio, fechaFin);
+        return libros.stream()
+                .filter(libro -> titulo == null || libro.getTitulo().toLowerCase().contains(titulo.toLowerCase()))
+                .filter(libro -> autor == null || libro.getAutor().toLowerCase().contains(autor.toLowerCase()))
+                .filter(libro -> categoria == null || libro.getCategoria().toLowerCase().contains(categoria.toLowerCase()))
+                .filter(libro -> valoracion == null || libro.getValoracion() != null && libro.getValoracion().equals(valoracion))
+                .filter(libro -> fechaInicio == null || (libro.getFechaPublicacion() != null && !libro.getFechaPublicacion().isBefore(fechaInicio)))
+                .filter(libro -> fechaFin == null || (libro.getFechaPublicacion() != null && !libro.getFechaPublicacion().isAfter(fechaFin)))
+                .toList();
     }
 
 
 
-    /** Retorna un libro por ID o lanza excepción si no existe **/
+
+        /** Retorna un libro por ID o lanza excepción si no existe **/
     public LibroEntity obtenerPorId(Long id) {
         return libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado con ID: " + id));
