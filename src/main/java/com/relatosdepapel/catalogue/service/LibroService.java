@@ -1,4 +1,7 @@
 package com.relatosdepapel.catalogue.service;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 
 // Importación de la entidad Libro
 import com.relatosdepapel.catalogue.entity.LibroEntity;
@@ -36,28 +39,28 @@ public class LibroService {
     private final LibroRepository libroRepository;
 
     /**
-     * Devuelve una lista con todos los libros disponibles en la base de datos.
+     * Devuelve todos los libros si no hay filtros,
+     * o realiza una búsqueda aplicando los filtros proporcionados.
      */
-    public List<LibroEntity> obtenerTodos() {
-        return libroRepository.findAll();
-    }
+    public List<LibroEntity> buscarLibros(String titulo, String autor, LocalDate fechaInicio, LocalDate fechaFin, String categoria, Integer valoracion) {
+        List<LibroEntity> libros = libroRepository.findAll();
 
+        return libros.stream()
+                .filter(libro -> titulo == null || libro.getTitulo().toLowerCase().contains(titulo.toLowerCase()))
+                .filter(libro -> autor == null || libro.getAutor().toLowerCase().contains(autor.toLowerCase()))
+                .filter(libro -> categoria == null || libro.getCategoria().toLowerCase().contains(categoria.toLowerCase()))
+                .filter(libro -> valoracion == null || libro.getValoracion() != null && libro.getValoracion().equals(valoracion))
+                .filter(libro -> fechaInicio == null || (libro.getFechaPublicacion() != null && !libro.getFechaPublicacion().isBefore(fechaInicio)))
+                .filter(libro -> fechaFin == null || (libro.getFechaPublicacion() != null && !libro.getFechaPublicacion().isAfter(fechaFin)))
+                .toList();
+    }
 
     /** Retorna un libro por ID o lanza excepción si no existe **/
     public LibroEntity obtenerPorId(Long id) {
         return libroRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Libro no encontrado con ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Libro no encontrado con ID: " + id));
     }
 
-    /**
-     * Realiza una búsqueda de libros aplicando filtros opcionales:
-     * - Título (puede ser parcial)
-     * - Autor (puede ser parcial)
-     * - Fecha de publicación mínima y máxima
-     */
-    public List<LibroEntity> buscarLibros(String titulo, String autor, LocalDate fechaInicio, LocalDate fechaFin) {
-        return libroRepository.buscarLibros(titulo, autor, fechaInicio, fechaFin);
-    }
 
     /**
      * Guarda un nuevo libro o actualiza uno existente.
@@ -67,10 +70,11 @@ public class LibroService {
         return libroRepository.save(libro);
     }
 
-
     /** Actualiza todos los campos de un libro existente **/
     public LibroEntity actualizarLibroCompleto(Long id, LibroEntity libroActualizado) {
-        LibroEntity libro = obtenerPorId(id);
+        LibroEntity libro = libroRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No se puede actualizar. Libro no encontrado con ID: " + id));
+
         libro.setTitulo(libroActualizado.getTitulo());
         libro.setAutor(libroActualizado.getAutor());
         libro.setFechaPublicacion(libroActualizado.getFechaPublicacion());
@@ -80,6 +84,7 @@ public class LibroService {
         libro.setVisible(libroActualizado.getVisible());
         libro.setStock(libroActualizado.getStock());
         libro.setPrecio(libroActualizado.getPrecio());
+
         return libroRepository.save(libro);
     }
 
@@ -88,14 +93,17 @@ public class LibroService {
      * Si el libro no existe, lanza una excepción.
      */
     public LibroEntity actualizarStock(Long id, Integer cantidad) {
+        LibroEntity libro = libroRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No se puede actualizar stock. Libro no encontrado con ID: " + id));
 
-        LibroEntity libro = libroRepository.findById(id).orElseThrow(); // Busca el libro por ID, o lanza excepción si no se encuentra
-        libro.setStock(libro.getStock() - cantidad); // Resta la cantidad al stock actual
-        return libroRepository.save(libro); // Guarda los cambios en la base de datos
+        libro.setStock(libro.getStock() - cantidad);
+        return libroRepository.save(libro);
     }
 
     /** Elimina un libro por ID **/
     public void eliminarLibro(Long id) {
-        libroRepository.deleteById(id);
+        LibroEntity libro = libroRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No se puede eliminar. Libro no encontrado con ID: " + id));
+        libroRepository.delete(libro);
     }
 }

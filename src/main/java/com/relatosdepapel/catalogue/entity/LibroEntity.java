@@ -29,14 +29,14 @@ public class LibroEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Se genera automáticamente con autoincremento (para PostgreSQL)
     private Long id;
 
-    @NotBlank(message = "el titulo del libro es obligatorio")// No puede ser null ni estar vacío
+    @NotBlank(message = "El titulo del libro es obligatorio")// No puede ser null ni estar vacío
     @Size(max = 255) // Longitud máxima de 255 caracteres, Validacion a nivel de aplicacion, valida antes de que los datos lleguen a la base de datos.
-    @Column(name = "titulo", nullable = false) // Se mapea con la columna 'titulo', no puede ser null
+    @Column(name = "titulo", nullable = false, length = 255) // Se mapea con la columna 'titulo', no puede ser null
     private String titulo;
 
     @NotBlank(message = "El autor es obligatorio")
     @Size(max = 255)
-    @Column(name = "autor", nullable = false)
+    @Column(name = "autor", nullable = false, length = 255)
     private String autor;
 
     @NotNull(message = "La fecha de publicación es obligatoria")
@@ -72,7 +72,7 @@ public class LibroEntity {
     @Column(name = "precio", precision = 10, scale = 2) // Permite precios con 2 decimales (hasta 99999999.99)
     private BigDecimal precio;
 
-    @Column(name = "fecha_cracion")
+    @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion; // Fecha de creación
 
     @Column(name = "fecha_actualizacion")
