@@ -40,13 +40,10 @@ logging:
     com.relatosdepapel.catalogue: DEBUG
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
+    tracer: TRACE
 
 elasticsearch:
   host: ${ELASTICSEARCH_HOST:relatospapelsearch-3210842660.us-east-1.bonsaisearch.net}
   credentials:
     user: ${ELASTICSEARCH_USER:xy88ycxsdp}
     password: ${ELASTICSEARCH_PWD:iva8rxl5n4}
-
-logging:
-  level:
-    tracer: TRACE
