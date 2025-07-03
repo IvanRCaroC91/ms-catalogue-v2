@@ -8,7 +8,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
 @Data
@@ -46,8 +45,8 @@ public class LibroEntity {
     private BigDecimal precio;
 
     @Field(type = FieldType.Date)
-    private LocalDateTime fechaCreacion;
+    private LocalDate fechaCreacion;
 
     @Field(type = FieldType.Date)
-    private LocalDateTime fechaActualizacion;
+    private LocalDate fechaActualizacion;
 }
