@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -27,7 +28,7 @@ public class LibroController {
     /**
      * GET /api/libros
      * Retorna todos los libros.
-     * Permite filtrar libros por título, autor o rango de fechas.
+     * Permite filtrar libros por título, autor, categoría, valoración y rango de fechas.
      */
     @GetMapping
     public List<LibroEntity> obtenerYFiltrarLibros(
@@ -35,8 +36,8 @@ public class LibroController {
             @RequestParam(required = false) String autor,
             @RequestParam(required = false) String categoria,
             @RequestParam(required = false) Integer valoracion,
-            @RequestParam(required = false) LocalDate fechaInicio,
-            @RequestParam(required = false) LocalDate fechaFin
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin
     ) {
         return libroService.buscarLibros(titulo, autor, fechaInicio, fechaFin, categoria, valoracion);
     }
@@ -46,18 +47,16 @@ public class LibroController {
      * Retorna un libro por su ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<?> obtenerPorId(@PathVariable String id) {
         try {
             LibroEntity libro = libroService.obtenerPorId(id);
             return ResponseEntity.ok(libro);
         } catch (NoSuchElementException e) {
-            // Devuelves 404 + mensaje en el body
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     Map.of("mensaje", e.getMessage())
             );
         }
     }
-
 
     /**
      * POST /api/libros
@@ -74,7 +73,7 @@ public class LibroController {
      * Reemplaza todos los datos de un libro existente.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarLibro(@PathVariable Long id, @RequestBody LibroEntity libroActualizado) {
+    public ResponseEntity<?> actualizarLibro(@PathVariable String id, @RequestBody LibroEntity libroActualizado) {
         try {
             LibroEntity actualizado = libroService.actualizarLibroCompleto(id, libroActualizado);
             return ResponseEntity.ok(actualizado);
@@ -90,7 +89,7 @@ public class LibroController {
      * Actualiza únicamente el stock de un libro.
      */
     @PatchMapping("/{id}/stock")
-    public ResponseEntity<?> actualizarStock(@PathVariable Long id, @RequestParam Integer cantidad) {
+    public ResponseEntity<?> actualizarStock(@PathVariable String id, @RequestParam Integer cantidad) {
         try {
             LibroEntity actualizado = libroService.actualizarStock(id, cantidad);
             return ResponseEntity.ok(actualizado);
@@ -106,7 +105,7 @@ public class LibroController {
      * Elimina un libro por ID.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarLibro(@PathVariable Long id) {
+    public ResponseEntity<?> eliminarLibro(@PathVariable String id) {
         try {
             libroService.eliminarLibro(id);
             return ResponseEntity.noContent().build();
@@ -115,5 +114,23 @@ public class LibroController {
                     Map.of("mensaje", e.getMessage())
             );
         }
+    }
+
+    /**
+     * GET /api/libros/autocomplete
+     * Autocompletado de título usando search-as-you-type.
+     */
+    @GetMapping("/autocomplete")
+    public List<LibroEntity> autocompletarTitulo(@RequestParam String query) {
+        return libroService.autocompletarTitulo(query);
+    }
+
+    /**
+     * GET /api/libros/search
+     * Búsqueda full-text en título y contenido.
+     */
+    @GetMapping("/search")
+    public List<LibroEntity> busquedaFullText(@RequestParam String query) {
+        return libroService.busquedaFullText(query);
     }
 }

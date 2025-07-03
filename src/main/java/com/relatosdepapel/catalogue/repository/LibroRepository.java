@@ -1,28 +1,46 @@
 package com.relatosdepapel.catalogue.repository;
 
-// Importación de la entidad Libro
 import com.relatosdepapel.catalogue.entity.LibroEntity;
-
-// Importaciones necesarias para el uso de Spring Data JPA
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.lang.Nullable;
-
-import java.time.LocalDate;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.elasticsearch.annotations.Query;
 import java.util.List;
 
-/**
- * Repositorio para operaciones de base de datos relacionadas con la entidad Libro.
- * Extiende JpaRepository, lo que proporciona métodos CRUD y consultas básicas automáticamente.
- */
-public interface LibroRepository extends JpaRepository<LibroEntity, Long> {
+public interface LibroRepository extends ElasticsearchRepository<LibroEntity, String> {
 
-    // Busca libros cuyo título contenga el texto proporcionado, sin importar mayúsculas o minúsculas.
-    List<LibroEntity> findByTituloContainingIgnoreCase(String titulo);
+    List<LibroEntity> findByTituloContaining(String titulo);
 
-    // Busca libros cuyo autor contenga el texto proporcionado, sin importar mayúsculas o minúsculas.
-    List<LibroEntity> findByAutorContainingIgnoreCase(String autor);
+    List<LibroEntity> findByAutorContaining(String autor);
 
+    List<LibroEntity> findByCategoria(String categoria);
 
+    List<LibroEntity> findByVisible(Boolean visible);
+
+    List<LibroEntity> findByPrecioBetween(Double min, Double max);
+
+    List<LibroEntity> findByValoracionGreaterThanEqual(Integer valoracion);
+
+    @Query("""
+    {
+      "multi_match": {
+        "query": "?0",
+        "type": "bool_prefix",
+        "fields": [
+          "titulo",
+          "titulo._2gram",
+          "titulo._3gram"
+        ]
+      }
+    }
+    """)
+    List<LibroEntity> autocompleteTitulo(String query);
+
+    @Query("""
+    {
+      "multi_match": {
+        "query": "?0",
+        "fields": [ "titulo", "contenido" ]
+      }
+    }
+    """)
+    List<LibroEntity> fullTextSearch(String texto);
 }
